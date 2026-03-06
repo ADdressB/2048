@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>迷你 2048 - 终极版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+    
+    <div class="container">
+        <div class="header">
+            <h1>2048</h1>
+            <div class="score-container">
+                <div class="score-box">
+                    <div class="score-label">分数</div>
+                    <div class="score" id="score">0</div>
+                    <div class="combo-display" id="combo-display"></div>
+                </div>
+                <div class="score-box">
+                    <div class="score-label">最高分</div>
+                    <div class="best-score" id="best-score">0</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-label">时间</div>
+                    <div class="timer" id="timer">00:00</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-new-game" id="new-game-btn">新游戏</button>
+            <button class="btn btn-pause" id="pause-btn">暂停</button>
+            <button class="btn btn-undo" id="undo-btn">撤销</button>
+            <div class="sound-toggle-container">
+                <label class="sound-toggle">
+                    <input type="checkbox" id="sound-toggle" checked>
+                    <span class="sound-slider"></span>
+                    <span class="sound-label-text">音效</span>
+                </label>
+            </div>
+            <div class="music-toggle-container">
+                <label class="sound-toggle">
+                    <input type="checkbox" id="music-toggle">
+                    <span class="sound-slider"></span>
+                    <span class="sound-label-text">音乐</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-row">
+            <div class="board-size-selector">
+                <span class="setting-label">棋盘：</span>
+                <button class="size-btn" data-size="3">3×3</button>
+                <button class="size-btn active" data-size="4">4×4</button>
+                <button class="size-btn" data-size="5">5×5</button>
+            </div>
+            <div class="theme-selector">
+                <span class="theme-label">主题：</span>
+                <button class="theme-btn theme-warm" data-theme="warm" title="暖色"></button>
+                <button class="theme-btn theme-cool" data-theme="cool" title="冷色"></button>
+                <button class="theme-btn theme-green" data-theme="green" title="绿色清新"></button>
+                <button class="theme-btn theme-dark" data-theme="dark" title="黑白灰"></button>
+                <button class="theme-btn theme-sakura" data-theme="sakura" title="樱花粉"></button>
+                <button class="theme-btn theme-ocean" data-theme="ocean" title="海洋蓝"></button>
+                <button class="theme-btn theme-galaxy" data-theme="galaxy" title="星空紫"></button>
+            </div>
+        </div>
+
+        <div class="accessibility-row">
+            <label class="checkbox-label">
+                <input type="checkbox" id="colorblind-mode">
+                <span>色盲模式</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="high-contrast-mode">
+                <span>高对比度</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="shake-effect" checked>
+                <span>震动效果</span>
+            </label>
+            <div class="font-size-control">
+                <span>字体：</span>
+                <button class="font-btn" data-size="small">小</button>
+                <button class="font-btn active" data-size="medium">中</button>
+                <button class="font-btn" data-size="large">大</button>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <p>使用方向键或滑动屏幕移动方块，相同数字合并！<span class="shortcut-hint">(快捷键: WASD或方向键)</span></p>
+        </div>
+
+        <div class="game-container" id="game-container">
+            <div class="grid-container" id="grid-container">
+            </div>
+            <div class="game-message" id="game-message">
+                <p></p>
+                <div class="message-buttons">
+                    <button class="btn btn-retry">再试一次</button>
+                    <button class="btn btn-share">分享成绩</button>
+                </div>
+            </div>
+            <div class="pause-overlay" id="pause-overlay">
+                <p>游戏已暂停</p>
+                <button class="btn btn-resume">继续游戏</button>
+            </div>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-label">移动次数：</span>
+                <span class="stat-value" id="moves">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">最大方块：</span>
+                <span class="stat-value" id="max-tile">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">连击：</span>
+                <span class="stat-value" id="combo">0x</span>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="achievements">成就</button>
+            <button class="tab-btn" data-tab="leaderboard">排行榜</button>
+            <button class="tab-btn" data-tab="stats">统计</button>
+            <button class="tab-btn" data-tab="history">历史</button>
+        </div>
+
+        <div class="tab-content active" id="achievements">
+            <div class="achievements-grid" id="achievements-grid"></div>
+        </div>
+
+        <div class="tab-content" id="leaderboard">
+            <div class="leaderboard-list" id="leaderboard-list"></div>
+        </div>
+
+        <div class="tab-content" id="stats">
+            <div class="stats-grid" id="stats-grid"></div>
+        </div>
+
+        <div class="tab-content" id="history">
+            <div class="history-list" id="history-list"></div>
+        </div>
+    </div>
+
+    <div class="tutorial-overlay" id="tutorial-overlay">
+        <div class="tutorial-content">
+            <h2>欢迎来到2048！</h2>
+            <div class="tutorial-step active" data-step="1">
+                <h3>游戏目标</h3>
+                <p>合并相同的数字方块，最终达到2048！</p>
+                <div class="tutorial-demo">
+                    <div class="demo-tile">2</div>
+                    <span>+</span>
+                    <div class="demo-tile">2</div>
+                    <span>=</span>
+                    <div class="demo-tile">4</div>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="2">
+                <h3>如何操作</h3>
+                <p>使用键盘方向键或WASD移动方块</p>
+                <p>在移动设备上，滑动屏幕即可</p>
+                <div class="key-hints">
+                    <div class="key">↑</div>
+                    <div class="key-row">
+                        <div class="key">←</div>
+                        <div class="key">↓</div>
+                        <div class="key">→</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="3">
+                <h3>游戏技巧</h3>
+                <ul>
+                    <li>尽量将大数字固定在一个角落</li>
+                    <li>保持行或列的数字有序排列</li>
+                    <li>避免随意移动，要有策略</li>
+                </ul>
+            </div>
+            <div class="tutorial-buttons">
+                <button class="btn btn-skip" id="skip-tutorial">跳过</button>
+                <button class="btn btn-next" id="next-tutorial">下一步</button>
+                <button class="btn btn-start hidden" id="start-game">开始游戏</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="confirm-dialog" id="confirm-dialog">
+        <div class="confirm-content">
+            <p id="confirm-message">确定要开始新游戏吗？</p>
+            <div class="confirm-buttons">
+                <button class="btn btn-cancel" id="confirm-cancel">取消</button>
+                <button class="btn btn-confirm" id="confirm-ok">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="achievement-popup" id="achievement-popup">
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-text">
+            <div class="achievement-title"></div>
+            <div class="achievement-desc"></div>
+        </div>
+    </div>
+
+    <div class="share-modal" id="share-modal">
+        <div class="share-content">
+            <h3>分享你的成绩</h3>
+            <canvas id="share-canvas"></canvas>
+            <div class="share-buttons">
+                <button class="btn btn-download" id="download-image">下载图片</button>
+                <button class="btn btn-copy" id="copy-link">复制链接</button>
+                <button class="btn btn-close-share">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
